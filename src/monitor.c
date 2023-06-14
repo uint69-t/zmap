@@ -136,10 +136,10 @@ static void monitor_update(void)
 		char time_left[20];
 		if (age < 5) {
 			time_left[0] = '\0';
-		} else {
-			char buf[20];
-			time_string((int)remaining_secs, 1, buf, sizeof(buf));
-			snprintf(time_left, sizeof(time_left), " (%s left)", buf);
+		} else { // TODO: FIX
+			//char buf[20];
+			//time_string((int)remaining_secs, 1, buf, sizeof(buf));
+			//snprintf(time_left, sizeof(time_left), " (%s left)", buf);
 		}
 		char time_past[20];
 		time_string((int)age, 0, time_past, sizeof(time_past));
