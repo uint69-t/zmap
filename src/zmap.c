@@ -135,17 +135,21 @@ static void start_zmap(void)
 	log_info("zmap", "started");
 
 	// finish setting up configuration
-	if (zconf.iface == NULL) { // TODO: FIX
-		//char errbuf[PCAP_ERRBUF_SIZE];
-               //char *iface = pcap_lookupdev(errbuf);
-               //if (iface == NULL) {
+	if (zconf.iface == NULL) {
+		char errbuf[PCAP_ERRBUF_SIZE];
+		pcap_if_t *iface;
+		pcap_findalldevs(&iface, errbuf);
+		if (iface->name == NULL) {
 			log_fatal("zmap", "could not detect default network interface "
 					"(e.g. eth0). Try running as root or setting"
 					" interface using -i flag.");
-		//}
-		//log_debug("zmap", "no interface provided. will use %s", iface);
-		//zconf.iface = iface;
+		}
+		log_info("zmap", "no interface provided. will use %s", iface->name);
+		zconf.iface = strdup(iface->name);
+
+		pcap_freealldevs(iface);
 	}
+
 	if (zconf.source_ip_first == NULL) {
 		struct in_addr default_ip;
 		zconf.source_ip_first = malloc(INET_ADDRSTRLEN);
@@ -475,6 +479,10 @@ int main(int argc, char *argv[])
 	}
 
 	start_zmap();
+
+	if (!args.interface_given) {
+		free(zconf.iface);
+	}
 
 	cmdline_parser_free(&args);
 	free(params);
